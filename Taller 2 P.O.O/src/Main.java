@@ -65,43 +65,130 @@
 
 import java.util.Scanner;
 import java.util.Random;
-import stdlib.ln;
+import edu.princeton.cs.stdlib.In;
 
 public class Main {
 
     public static void main(String[] args) {
 
 
-        /* public static int lineasArchivo(string nombreArchivo) {
+        int cantJugadores = lineasArchivo("jugadores.csv");
+        int cantCanciones = lineasArchivo("canciones.csv");
 
-            In archivo = new In(nombreArchivo);
+        Cancion[] canciones = new Cancion[cantCanciones];
+        leerCanciones("canciones.csv",canciones);
 
+        Jugador[] jugadoresEnTexto = new Jugador[cantJugadores + 1];
+        leerJugadores("jugadores.csv",jugadoresEnTexto);
 
-        }
-
-
-        Jugador[] jugadores = int [jugadoresEnLista + 1];
-
-        boolean jugadorHallado = false;
         Scanner sc = new Scanner(System.in);
+        boolean jugadorHallado = false;
 
-        while(jugadorHallado = false) {
+        String nombreJugador5 = jugadoresEnTexto[4].getNombre();
 
-            System.out.println("BIENVENIDO A PROJECT DIVA X! ^o^");
-            System.out.println("Ingrese su usuario:");
-
-            String nombreJugador = sc.nextLine();
-
-            for (int i = 0; i < cantJugadores; i++) {
-                if nombreJugador ==
-            }
-
-
-
-        }*/
+        System.out.println("Numero del quinto jugador en el texto: " + nombreJugador5);
 
     }
 
+    public static int lineasArchivo(String nombreArchivo) {
+
+        int contadorLineas = 0;
+
+        In archivo = new In(nombreArchivo);
+
+        if (archivo.exists()) {
+            while (archivo.hasNextLine()) {
+                archivo.readLine();
+                contadorLineas++;
+            }
+            archivo.close();
+        }
+        return contadorLineas;
+    }
+
+    public static void leerJugadores(String nombreArchivo,Jugador[] jugadoresRegistrados){
+
+        In archivo = new In(nombreArchivo);
+        int nroJugador = 0;
+
+        while (archivo.hasNextLine()) {
+
+            String linea = archivo.readLine();
+
+            if (linea.trim().isEmpty()) {
+                continue;
+            }
+
+            String[] partes = linea.split(",");
+            String nombreJugador = partes[0].trim();
+
+            Jugador nuevoJugador = new Jugador(nombreJugador);
+
+            if (partes.length > 1) {
+
+                String textoModulos = partes[1].trim();
+                String[] modulos = textoModulos.split(";");
+
+                for (int i = 0; i < modulos.length; i++) {
+
+                    String moduloIndividual = modulos[i].trim();
+                    String[] datosModulo = moduloIndividual.split(":");
+
+                    String nombreModulo = datosModulo[0].trim();
+                    String nombreAfinidad = datosModulo[1].trim().toUpperCase();
+
+                    Afinidad afinidadModulo = Afinidad.valueOf(nombreAfinidad);
+
+                    Modulo moduloJugador = new Modulo(nombreModulo,afinidadModulo);
+
+                    nuevoJugador.agregarModulo(moduloJugador);
 
 
+                }
+                jugadoresRegistrados[nroJugador] = nuevoJugador;
+                nroJugador++;
+            } else {
+                jugadoresRegistrados[nroJugador] = nuevoJugador;
+                nroJugador++;
+            }
+        }
+    }
+    public static void leerCanciones(String nombreArchivo,Cancion[] canciones){
+
+        In archivo = new In(nombreArchivo);
+        int nroCancion = 0;
+
+        while (archivo.hasNextLine()) {
+
+            String linea = archivo.readLine();
+
+            if (linea.trim().isEmpty()) {
+                continue;
+            }
+
+            String[] partes = linea.split(",");
+
+            String nombreCancion = partes[0].trim();
+
+            String textoDificultad = partes[1].trim().toUpperCase();
+            Dificultad dificultadCancion = Dificultad.valueOf(textoDificultad);
+
+            int puntajeBase = Integer.parseInt(partes[2].trim());
+
+            String textoAfinidad = partes[3].trim().toUpperCase();
+            Afinidad afinidadCancion = Afinidad.valueOf(textoAfinidad);
+
+
+            Cancion nuevaCancion = new Cancion(nombreCancion,dificultadCancion,puntajeBase,afinidadCancion);
+
+            canciones[nroCancion] = nuevaCancion;
+            nroCancion++;
+
+        }
+    }
 }
+
+
+
+
+

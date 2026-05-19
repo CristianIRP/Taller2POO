@@ -1,11 +1,11 @@
 public class Cancion {
 
     private String nombre;
-    private String dificultad;
+    private Dificultad dificultad;
     private int puntajeBase;
     private Afinidad afinidad;
 
-    public Cancion(String nombre, String dificultad, int puntajeBase, Afinidad afinidad){
+    public Cancion(String nombre, Dificultad dificultad, int puntajeBase, Afinidad afinidad){
         this.nombre = nombre;
         this.dificultad = dificultad;
         this.puntajeBase = puntajeBase;
@@ -14,7 +14,7 @@ public class Cancion {
     public String getNombre() {
         return nombre;
     }
-    public String getDificultad() {
+    public Dificultad getDificultad() {
         return dificultad;
     }
     public int getPuntajeBase() {
