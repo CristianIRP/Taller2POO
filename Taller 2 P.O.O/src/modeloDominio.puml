@@ -1,0 +1,59 @@
+@startuml
+skin rose
+left to right direction
+
+entity Partida {
+
+    +Modulo
+    +Cancion
+}
+
+entity Usuario {
+
+    + NombreUsuario
+    + Modulo
+}
+
+entity Modulo {
+
+    +NombreModulo
+    +Afinidad
+}
+
+entity Cancion {
+
+    +NombreCancion
+    +Dificultad*
+    +PuntajeBase
+    +Afinidad*
+}
+
+enum Dificultad{
+
+    +Facil
+    +Normal
+    +Dificil
+    +Extremo
+}
+
+enum Afinidad{
+
+    +Neutral
+    +Cute
+    +Cool
+    +Elegant
+    +Quirky
+}
+
+Partida --> Modulo: tiene 1
+Partida --> Cancion: tiene 1
+
+Usuario --> Modulo: tiene n...
+
+
+Modulo --> Afinidad
+
+Cancion --> Afinidad
+Cancion --> Dificultad
+
+@enduml
