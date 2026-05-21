@@ -1,0 +1,46 @@
+@startuml
+skin rose
+left to right direction
+
+class Jugador {
+
+   - NombreJugador
+   - Modulo
+   - CantidadModulos
+
+}
+
+class Modulo {
+    -NombreModulo
+    -Afinidad
+}
+
+class Cancion {
+
+    -Nombre
+    -Dificultad
+    -PuntajeBase
+    -Afinidad
+}
+
+enum Dificultad{
+    +Facil
+    +Normal
+    +Dificil
+    +Extremo
+}
+
+enum Afinidad{
+    +Neutral
+    +Cute
+    +Cool
+    +Elegant
+    +Quirky
+}
+
+Jugador"..*" --"1..10"Modulo: viste >
+Modulo -- Afinidad: asociado >
+Cancion "..*" -- "1"Afinidad: asociado >
+Cancion"..*" -- "1"Dificultad: tiene >
+
+@enduml

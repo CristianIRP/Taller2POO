@@ -1,0 +1,56 @@
+@startuml
+skin rose
+left to right direction
+
+class Jugador {
+
+   - NombreJugador: String
+   - Modulo: String
+   - cantModulos: Int
+   +getNombre(): String
+   +getModulo(): String
+   +getCantModulos(): Int
+}
+
+class Modulo {
+    -NombreModulo
+    -Afinidad
+    +getNombre(): String
+    +getAfinidad(): String
+}
+
+class Cancion {
+
+    -Nombre: String
+    -Dificultad: String
+    -PuntajeBase: Int
+    -Afinidad: String
+
+    +getNombre(): String
+    +getDificultad(): String
+    +getPuntajeBase(): Int
+    +getAfinidad(): String
+}
+
+enum Dificultad{
+
+    +Facil
+    +Normal
+    +Dificil
+    +Extremo
+}
+
+enum Afinidad{
+    +Neutral
+    +Cute
+    +Cool
+    +Elegant
+    +Quirky
+}
+
+Jugador"..*" --"1..10"Modulo: viste >
+Modulo -- Afinidad: asociado >
+Cancion "..*" -- "1"Afinidad: asociado >
+Cancion"..*" -- "1"Dificultad: tiene >
+
+@enduml
