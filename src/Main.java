@@ -73,25 +73,29 @@ public class Main {
      * Metodo main en el que se llamara a los metodos necesarios para el funcionamiento del programa
      */
     public static void main(String[] args) {
-        // Analizamos la cantidad de jugadores y cantidad de canciones que hay
+
+        // Analizamos la cantidad de jugadores y cantidad de canciones que hay en el archivo de texto
         int cantJugadores = lineasArchivo("jugadores.csv");
         int cantCanciones = lineasArchivo("canciones.csv");
 
-        // Array que guarda las canciones del archivo canciones.csv
+        // Arreglo que guarda las canciones del archivo canciones.csv
         Cancion[] canciones = new Cancion[cantCanciones];
         leerCanciones("canciones.csv",canciones);
 
-        // Array que guarda los jugadores registrados en conjunto de sus modulos y afinidades de estos mismos
+        // Arreglo que guarda los jugadores registrados en conjunto de sus modulos y afinidades de estos mismos
+        // con un espacio adicional en caso de querer crear un nuevo Jugador
         Jugador[] jugadores = new Jugador[cantJugadores + 1];
         leerJugadores("jugadores.csv",jugadores);
 
-        // Establecemos el jugador registrado con el que jugaremos (no se bien como explicarlo sin decir jugador
-        // tantas veces jdsjksd)
+        // Se establece cual de los jugadores registrados es el que opera el programa, tanto en caso de ser uno
+        // existente como en caso de ser uno nuevo
         Jugador jugadorActual = establecerJugador(jugadores, cantJugadores);
 
-        int opciones = 0;
+        // Se crea la opcion previamente para cerrar el programa al escogerse la opcion 4
+        int opcion = 0;
 
-        while ( opciones != 4) {
+        //Ciclo del menu principal, no finaliza hasta que se escoja la opcion 4
+        while ( opcion != 4) {
 
             Scanner sc = new Scanner(System.in);
 
@@ -103,19 +107,25 @@ public class Main {
                     "4.- Guardar y salir.");
 
             // Usuario ingresa la opcion
-            int opcion = sc.nextInt();
+            opcion = sc.nextInt();
 
-            // if opciones...
+            // Opciones disponibles
+
+            // Opcion 1: Se muestran los datos del jugador
+            // Opcion 2: Se calcula el puntaje maximo obtenible en una cancion con un modulo del jugador
+            // Opcion 3: Se crea un modulo nuevo para el jugador
+            // Opcion 4: Guarda los cambios en el bloc de notas y se cierra el programa
+
+
             if (opcion == 1) {
                 mostrarJugador(jugadorActual);
-
             } else if (opcion == 2) {
-                calcularPorcentaje(jugadorActual,canciones);
-
+                calcularPuntaje(jugadorActual,canciones);
             } else if (opcion == 3) {
                 crearModulo(jugadorActual);
             } else if (opcion == 4) {
                 guardarJugadores("jugadores.csv", jugadores, cantJugadores);
+                System.out.println("Finalizando programa...");
             } else {
                 System.out.println("\n" +
                         "/// ERROR: Ingrese una opcion valida. ///\n");
@@ -129,17 +139,19 @@ public class Main {
 
     /*
      * Metodo para crear el modulo definido por el usuario
-     * @param jugadorActual Jugador con el que se jugara, inicia en null y se le asigna un valor en
-     *  el metodo establecerJugador
+     *
+     * @param jugadorActual Jugador operando el programa, establecido en establecerJugador
      */
     public static void crearModulo(Jugador jugadorActual) {
 
         Scanner sc = new Scanner(System.in);
 
-        // cantidad de modulos del jugador
+        // Cantidad de modulos del jugador
         int cantModulos = jugadorActual.getCantModulos();
-        // array de modulos registrados en el jugador
+        // Arreglo de modulos registrados en el jugador
         Modulo[] modulos = jugadorActual.getModulos();
+
+        // Se solicita el nombre del modulo nuevo
 
         System.out.println("====== CREAR MODULO ======\n" +
                 "Ingrese el nombre del modulo nuevo:");
@@ -148,7 +160,7 @@ public class Main {
         boolean jugadorRepetido = false;
         Afinidad afinidadNueva = null;
 
-
+        // Se valida que exista un modulo del mismo nombre asociado al jugador
         for (int i = 0; i<cantModulos; i++) {
             String nombreModuloCiclo = modulos[i].getNombre();
             if (nombreModulo.equalsIgnoreCase(nombreModuloCiclo)) {
@@ -163,43 +175,44 @@ public class Main {
             String afinidadDeseada = sc.nextLine().trim().toUpperCase();
 
             try {
-                // convierte el texto a un valor valido del enum afinidad
+                // Convierte el texto a un valor valido del enum afinidad
                 afinidadNueva = Afinidad.valueOf(afinidadDeseada);
             } catch (IllegalArgumentException e) {
                 System.out.println(" /// ERROR: Afinidad invalida");
             }
-            // si la afinidad fue valida y se logro asignar, se registra el modulo
+            // Si la afinidad fue valida y se logro asignar, se registra el modulo
             if (afinidadNueva != null) {
                 Modulo moduloNuevo = new Modulo(nombreModulo,afinidadNueva);
                 jugadorActual.agregarModulo(moduloNuevo);
                 System.out.println("Modulo registrado con exito! Reviselo en (1.- Mostrar datos del jugador).");
             }
-
         } else {
+            // Si el modulo no existe se cierra el proceso de creacion sin asignar el modulo
             System.out.println("/// ERROR:Modulo ya existente. ///");
         }
     }
 
     /*
      * Metodo para calcular el puntaje maximo obtenible en una cancion en base a los modulos del jugador
-     * @param jugadorActual Jugador con el que se esta jugando actualmente
-     * @param canciones Array que contiene las canciones del archivo canciones.csv
+     *
+     * @param jugadorActual jugador operando el programa, establecido en establecerJugador
+     * @param canciones arreglo que contiene las canciones del archivo canciones.csv
      */
-    public static void  calcularPorcentaje(Jugador jugadorActual,Cancion[] canciones){
+    public static void  calcularPuntaje(Jugador jugadorActual,Cancion[] canciones){
 
         Scanner sc = new Scanner(System.in);
         double puntajeTotal = 0;
 
-        // recuperamos la info de los modulos del jugador actual
+        // Recuperamos la info de los modulos del jugador actual
         int cantModulos = jugadorActual.getCantModulos();
         Modulo[] modulos = jugadorActual.getModulos();
 
 
-        // validamos que el jugador tenga al menos un modulo
+        // Validamos que el jugador tenga al menos un modulo
         if(cantModulos != 0) {
             System.out.println("=== PUNTAJE MAXIMO OBTENIBLE ===\n" +
                     "Canciones registradas (Nombre, Dificultad, Puntaje Base, Afinidad):\n");
-            // desplegamos la lista completa de canciones que estan en el archivo
+            // Desplegamos la lista completa de canciones que estan en el archivo
             for (int i = 0; i<canciones.length;i++) {
 
                 String nombreCancion = canciones[i].getNombre();
@@ -213,8 +226,8 @@ public class Main {
 
             System.out.println("Elija una cancion para calcular:");
 
-            // restamos 1 al indicce ingresado ya que el usuario ve la lista partiendo desde el 1 pero en realidad
-            // empieza desde 0, ojo con eso
+            // Restamos 1 al indicce ingresado ya que el usuario ve la lista partiendo desde el 1 pero en realidad
+            // empieza desde 0, y se obtienen los datos de la cancion deseada
             int indiceCancion = sc.nextInt();
             Cancion cancionEscogida = canciones[indiceCancion - 1];
             String nombreCancion = cancionEscogida.getNombre();
@@ -224,32 +237,34 @@ public class Main {
             System.out.println("Cancion escogida: " + nombreCancion + " | " + afinidadCancion);
             System.out.println("\n" +
                     "Escoja un modulo:");
-            // desplegamos la lista de modulos que posee el jugador actual
+            // Desplegamos la lista de modulos que posee el jugador actual
             for(int i = 0; i<cantModulos; i++) {
                 String nombreModulo = modulos[i].getNombre();
                 Afinidad afinidadModulo = modulos[i].getAfinidad();
 
                 System.out.println("-Modulo " + (i + 1) + ": " + nombreModulo + "/ " + afinidadModulo);
             }
-            // obtenemos el modulo seleccionado por el usuario (ojo con el desfase de -1)
+            // Obtenemos el modulo seleccionado por el usuario restando uno para evitar malinterpretacion de indice
             int moduloIngresado = sc.nextInt();
             Modulo moduloEscogido = modulos[moduloIngresado - 1];
 
             // Evaluamos todas las afinidades y su compatibilidad
             if(moduloEscogido.getAfinidad() == afinidadCancion) {
-                // caso 1, afinidades identicas
+                // Caso 1: Afinidades identicas (incluso si NEUTRAL(Modulo) = NEUTRAL(Cancion))
                 puntajeTotal = puntajeBase * 1.2;
                 System.out.println("El puntaje maximo obtenible es de " + puntajeTotal + " puntos.");
             } else if(moduloEscogido.getAfinidad() == Afinidad.NEUTRAL) {
-                // caso 2, afinidad neutral
+                // Caso 2: Afinidad neutral distinta a la cancion
                 puntajeTotal = puntajeBase * 1.1;
                 System.out.println("El puntaje maximo obtenible es de " + puntajeTotal + " puntos.");
             } else {
-                // caso 3, afinidad distinta pero no neutral
+                // Caso 3: Afinidad distinta (No neutral)
                 puntajeTotal = puntajeBase * 1.15;
                 System.out.println("El puntaje maximo obtenible es de " + puntajeTotal + " puntos.");
             }
+
         } else {
+            // En caso de no poseer modulos (Usuario nuevo) se invalida la opcion
             System.out.println("\n" +
                     "/// ERROR: Jugador sin modulos registrados ///\n" +
                     "Ingrese modulos para calcular un puntaje maximo.\n");
@@ -259,7 +274,8 @@ public class Main {
     /*
      * Mostrara al jugador seleccionado y retornara su nombre y sus modulos registrados con
      * sus nombres de modulos correspondientes y afinidades.
-     * @param jugadorActual Jugador actual con el que se jugara, inicia en null
+     *
+     * @param jugadorActual jugador operando el programa, establecido en establecerJugador
      */
     public static void mostrarJugador(Jugador jugadorActual) {
 
@@ -267,6 +283,7 @@ public class Main {
         int cantModulosJugador = jugadorActual.getCantModulos();
         Modulo[] modulosJugador = jugadorActual.getModulos();
 
+        // Se muestra el menu y el nombre del usuario
         System.out.println("------ DATOS DEL JUGADOR ------\n" +
                 "Nombre del jugador:" + nombreJugador + "\n" +
                 "\n" +
@@ -288,46 +305,46 @@ public class Main {
 
     /*
      * Metodo para establecer el jugador actual (con el que se jugara)
-     * @param jugadores Array de jugadores dentro del sistema
-     * @param cantJugadores Cantidad de jugadores en el array
-     * @return jugadorActual Jugador con el que se jugara (valga la redundancia)
+     * @param jugadores Arreglo de jugadores dentro del sistema
+     * @param cantJugadores Cantidad de jugadores en el arreglo
+     * @param jugadorActual jugador operando el programa, establecido en establecerJugador
      */
     public static Jugador establecerJugador(Jugador[] jugadores,int cantJugadores) {
 
         Jugador jugadorActual = null;
         Scanner sc = new Scanner(System.in);
 
-        // el bucle no se detendra hasta encontrar un jugador registrado o crear uno
+        // El bucle no se detendra hasta encontrar un jugador registrado o crear uno
         while(jugadorActual == null)  {
 
             System.out.println("Ingrese su jugador:");
             String nombreBuscado = sc.nextLine().trim();
-            boolean jugadorHallado = false;
-            // recorremos el arreglo buscando coincidencias de nombres
+            // Recorremos el arreglo buscando coincidencias de nombres
             for (int i = 0; i < cantJugadores; i++) {
 
                 String nombreCiclo = jugadores[i].getNombre();
 
                 if(nombreBuscado.equalsIgnoreCase(nombreCiclo)) {
-                    // asignmaos el jugador encontrado para romper el bucle while
+                    // Asignamaos el jugador encontrado para romper el bucle while
                     jugadorActual = jugadores[i];
-                    jugadorHallado = true;
                 }
             }
-            // submenu en caso de que el jugador ingresado no exista
-            if (jugadorHallado == false) {
+            // Submenu en caso de que el jugador ingresado no exista
+            if (jugadorActual == null) {
                 System.out.println("// No se ha encontrado el jugador ingresado //\n" +
                         "1.- Ingresar otro jugador\n" +
                         "2.- Crear jugador nuevo");
 
 
                 int opcionIngresada = sc.nextInt();
-                // limpiamos el buffer para evitar los problemas con los sgtes sc.nextline
+                // Limpiamos el buffer para evitar los problemas con los siguientes "sc.nextline()"
                 sc.nextLine();
 
+                // Se sigue el ciclo while y se repite el proceso intentando otro jugador
                 if (opcionIngresada == 1) {
                     System.out.println("Se intentara otro jugador...");
 
+                // Se crea un nuevo jugador, solicitando su nombre
                 } else if (opcionIngresada == 2) {
                     System.out.println("Creando jugador...");
                     System.out.println("Ingrese su nombre:");
@@ -354,24 +371,25 @@ public class Main {
     /*
      * Cuenta la cantidad de lineas que contiene el archivo de texto
      * y verifica la existencia del archivo
-     * @param nombreArchivo
+     * @param nombreArchivo (canciones.csv / jugadores.csv)
      * @return contadorLineas El numero de lineas encontradas en el archivo, si el archivo no existe, retorna 0
      */
     public static int lineasArchivo(String nombreArchivo) {
 
+        // Variable que guarda la cantidad de lineas del texto
         int contadorLineas = 0;
 
         In archivo = new In(nombreArchivo);
-        // comprobamos que el archivo existe antes de intentar leerlo para que no lance error
+        // Comprobamos que el archivo existe antes de intentar leerlo para que no lance error
         if (archivo.exists()) {
-            // recorremos el archivo hasta llegar al final
+            // Recorremos el archivo hasta llegar al final
             while (archivo.hasNextLine()) {
-                // avanza a la siguiente linea
+                // Avanza a la siguiente linea
                 archivo.readLine();
-                // registra la ultima linea procesada y le añade +1 al contadorLineas
+                // Registra la ultima linea procesada y le añade +1 al contadorLineas
                 contadorLineas++;
             }
-            // cerramos el archivo
+            // Cerramos el archivo
             archivo.close();
         }
         return contadorLineas;
@@ -379,35 +397,36 @@ public class Main {
 
     /*
      * Lee el archivo de texto con los jugadores registrados y sus modulos asociados
-     * @param nombreArchivo Nombre del archivo
-     * @param jugadores Array de jugadores donde se guardan los jugadores registrados en el archivo jugadores.csv
+     * @param nombreArchivo Nombre del archivo (solo se aplica a jugadores.csv)
+     * @param jugadores Arreglo de jugadores donde se guardan los jugadores registrados en el archivo jugadores.csv
      */
     public static void leerJugadores(String nombreArchivo,Jugador[] jugadores){
 
+        // Recepcion del archivo y variable "Indice" para asignar los jugadores
         In archivo = new In(nombreArchivo);
         int nroJugador = 0;
 
         while (archivo.hasNextLine()) {
 
             String linea = archivo.readLine();
-            // ignoramos/saltamos las lineas vacias para no corromper nada
+            // Ignoramos/saltamos las lineas vacias para no corromper nada
             if (linea.trim().isEmpty()) {
                 continue;
             }
 
-            // separamos la linea en 2 partes, nombreJugador y su bloque de modulos
+            // Separamos la linea en 2 partes, nombreJugador y su bloque de modulos
             String[] partes = linea.split(",");
             String nombreJugador = partes[0].trim();
 
             Jugador nuevoJugador = new Jugador(nombreJugador);
-            // verificamos que la linea tiene si o si info de modulos despues de la coma
+            // Verificamos que la linea tiene si o si info de modulos despues de la coma
             if (partes.length > 1) {
 
                 String textoModulos = partes[1].trim();
-                // separamos los modulos con ";"
+                // Separamos los modulos con ";"
                 String[] modulos = textoModulos.split(";");
 
-                //procesamos uno a uno cada bloque de modulo que extraigamos
+                // Procesamos uno a uno cada bloque de modulo que extraigamos
                 for (int i = 0; i < modulos.length; i++) {
 
                     String moduloIndividual = modulos[i].trim();
@@ -417,7 +436,7 @@ public class Main {
                     String nombreModulo = datosModulo[0].trim();
                     String nombreAfinidad = datosModulo[1].trim().toUpperCase();
 
-                    // convertimos el texto de afinidad a un valor valido del enum afinidad
+                    // Convertimos el texto de afinidad a un valor valido del enum afinidad
                     Afinidad afinidadModulo = Afinidad.valueOf(nombreAfinidad);
 
                     Modulo moduloJugador = new Modulo(nombreModulo,afinidadModulo);
@@ -427,7 +446,7 @@ public class Main {
                 jugadores[nroJugador] = nuevoJugador;
                 nroJugador++;
             } else {
-                // si el jugador no tiene modulos, guardamos su perfil sin nada mas
+                // Si el jugador no tiene modulos, guardamos su perfil sin nada mas
                 jugadores[nroJugador] = nuevoJugador;
                 nroJugador++;
             }
@@ -437,10 +456,11 @@ public class Main {
     /*
      * Metodo que lee las canciones
      * @param nombreArchivo Nombre del archivo de texto con las canciones registradas
-     * @param canciones Array de canciones donde se guardan las canciones del archivo
+     * @param canciones Arreglo de canciones donde se guardan las canciones del archivo
      */
     public static void leerCanciones(String nombreArchivo,Cancion[] canciones){
 
+        // Recepcion del archivo y variable "Indice" para asignar las canciones
         In archivo = new In(nombreArchivo);
         int nroCancion = 0;
 
@@ -476,8 +496,8 @@ public class Main {
 
     /*
      * Metodo que guarda los jugadores en el archivo jugadores.csv
-     * @param nombreArchivo Nombre del archivo donde se guardaran los jugadores que se registren
-     * @param jugadores Array de jugadores registrados
+     * @param nombreArchivo Nombre del archivo donde se sobreescribiran los datos (solo aplica a jugadores.csv)
+     * @param jugadores Arreglo de jugadores registrados
      * @param cantJugadores Cantidad de jugadores en el registro
      */
     public static void guardarJugadores(String nombreArchivo, Jugador[] jugadores, int cantJugadores){
@@ -487,7 +507,7 @@ public class Main {
 
             for (int i = 0; i < jugadores.length; i++) {
                 Jugador j = jugadores[i];
-                // si hay un espacio nulo, lo saltamos
+                // Si hay un espacio nulo, lo saltamos
                 if (j == null) continue;
 
                 StringBuilder linea = new StringBuilder();
@@ -508,12 +528,12 @@ public class Main {
                         }
                     }
                 }
-                // aca escribimos la linea
+                // Aca escribimos la linea
                 escritor.println(linea.toString());
             }
-            //cerramos para confirmar la escritura
+            //Cerramos para confirmar la escritura
             escritor.close();
-            System.out.println("Jugador guardado");
+            System.out.println("Cambios en jugadores guardados con exito!");
         } catch(java.io.IOException e){
             // por si ocurre algun error, tira este texto
             System.out.println("Error al guardar el jugador");
